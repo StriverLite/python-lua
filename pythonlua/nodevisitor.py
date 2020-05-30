@@ -231,7 +231,7 @@ class NodeVisitor(ast.NodeVisitor):
 
         for key in node.keys:
             value = self.visit_all(key, inline=True)
-            if isinstance(key, ast.Str) or isinstance(key, ast.Name):
+            if isinstance(key, (ast.Str, ast.Name, ast.Attribute)):
                 value = "[{}]".format(value)
             keys.append(value)
 
