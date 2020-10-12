@@ -27,9 +27,17 @@ function isinstance(obj,typ)
         typ = "string"
     end
     if rawtype(typ) == "table" then
-        -- here we should also check for types of _bases
         ret = getmetatable(typ).__type or "table"
-        return type(obj) == ret
+        otyp = type(obj)
+        if otyp == ret then return true end
+        if otyp._bases then
+            for _, base in ipairs(otyp._bases) do
+                if isinstance(base,typ) then
+                    return true
+                end
+            end
+        end
+        return false
     end
     return type(obj) == typ
 end
@@ -673,7 +681,7 @@ function class(class_init, name, bases, mtmethods, properties)
     end
     imt.__index = function(tbl, idx)
         local attr = c.attrs[idx]
-        
+
         if (c.properties[idx]) then
             return attr.gfunc(tbl)
         end

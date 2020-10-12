@@ -23,6 +23,7 @@ class NodeVisitor(ast.NodeVisitor):
 
     def visit_Assign(self, node):
         """Visit assign"""
+
         target = self.visit_all(node.targets[0], inline=True)
         value = self.visit_all(node.value, inline=True)
         target_name = target
@@ -35,10 +36,25 @@ class NodeVisitor(ast.NodeVisitor):
 
         if last_ctx["class_name"]:
             target = ".".join([last_ctx["class_name"], target])
-        if not (self.context.top() and not self.config["top_locals"]) and "." not in target and not last_ctx["locals"].exists(target_name) and not last_ctx["globals"].exists(target_name):
-            local_keyword = "local "
-        if "." not in target and not last_ctx["locals"].exists(target_name) and not last_ctx["globals"].exists(target_name):
-            last_ctx["locals"].add_symbol(target)
+        if "," not in target or True:
+            if not (self.context.top() and not self.config["top_locals"]) and "." not in target and not last_ctx["locals"].exists(target_name) and not last_ctx["globals"].exists(target_name):
+                local_keyword = "local "
+            if "." not in target and not last_ctx["locals"].exists(target_name) and not last_ctx["globals"].exists(target_name):
+                last_ctx["locals"].add_symbol(target_name)
+        # else:
+        #
+        #     targets = target.split()
+        #     c = 0
+        #     for t in targets:
+        #         target_name = t
+        #         if "[" in target_name:
+        #             target_name = target_name[:target_name.index("[")]
+        #         if not (self.context.top() and not self.config["top_locals"]) and "." not in t and not last_ctx["locals"].exists(target_name) and not last_ctx["globals"].exists(target_name):
+        #             c+=1
+        #         if "." not in t and not last_ctx["locals"].exists(target_name) and not last_ctx["globals"].exists(target_name):
+        #             last_ctx["locals"].add_symbol(target_name)
+        #     if c == len(targets):
+        #         local_keyword = "local "
 
 
         self.emit("{local}{target} = {value}".format(local=local_keyword,
@@ -434,7 +450,7 @@ class NodeVisitor(ast.NodeVisitor):
 
     def visit_IfExp(self, node):
         """Visit if expression"""
-        line = "{cond} and {true_cond} or {false_cond}"
+        line = "(function() if {cond} then return {true_cond} end return {false_cond} end)()"
         values = {
             "cond": self.visit_all(node.test, inline=True),
             "true_cond": self.visit_all(node.body, inline=True),
