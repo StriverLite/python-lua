@@ -378,7 +378,7 @@ class NodeVisitor(ast.NodeVisitor):
 
         arg_index = -1
         for i in reversed(node.args.defaults):
-            line = "{name} = {name} or {value}"
+            line = "if {name} == nil then {name} = {value} end"
 
             arg = node.args.args[arg_index]
             values = {
