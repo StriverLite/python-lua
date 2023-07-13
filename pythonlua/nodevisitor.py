@@ -612,7 +612,7 @@ class NodeVisitor(ast.NodeVisitor):
     def visit_Subscript(self, node):
         """Visit subscript"""
         line = "{name}[{index}]"
-        if not isinstance(node.slice,ast.Slice) and not isinstance(node.slice,ast.ExtSlice) and isinstance(node.slice.value,ast.Tuple):
+        if not isinstance(node.slice,ast.Slice) and not isinstance(node.slice,ast.ExtSlice):
             values = {
                 "name": self.visit_all(node.value, inline=True),
                 "index": "tuple {"+self.visit_all(node.slice, inline=True)+"}",
